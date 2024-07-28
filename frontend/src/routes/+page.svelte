@@ -1,79 +1,88 @@
-<script lang="ts">
-  import { onMount } from 'svelte';
-  let email: string = '';
-  let file: File | null = null;
-
-  const handleFileChange = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    file = target.files?.[0] || null;
-  };
-
-  const handleSubmit = async (event: Event) => {
-    event.preventDefault();
-    if (!file || !email) {
-      alert('Please provide both a video file and your email.');
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('email', email);
-
-    try {
-      const response = await fetch('http://localhost:5000/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (response.ok) {
-        alert('File uploaded successfully!');
-      } else {
-        alert('Failed to upload file.');
-      }
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      alert('An error occurred while uploading the file.');
-    }
-  };
+<script>
 </script>
 
-<main>
-  <h1>Video to Audio Converter</h1>
-  <form on:submit|preventDefault={handleSubmit}>
-    <input type="email" bind:value={email} placeholder="Enter your email" required />
-    <input type="file" accept="video/*" on:change={handleFileChange} required />
-    <button type="submit">Upload</button>
+<div class="container">
+  <form method="POST" class="form">
+    <input
+      type="email"
+      placeholder="Enter email to notify"
+      name="email"
+      required
+      id="email"
+    />
+    <label for="file" class="video-container">
+      Drag and Drop Video
+      <input
+        type="file"
+        placeholder="Select a video file"
+        required
+        dropzone="bind:this"
+        name="file"
+        id="file"
+        accept="video/*"
+      />
+    </label>
+    <button type="submit" class="submit-btn"> Convert </button>
   </form>
-</main>
+</div>
 
 <style>
-  main {
-    text-align: center;
-    padding: 1em;
-    max-width: 240px;
-    margin: 0 auto;
+  .container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
-
-  h1 {
-    color: #ff3e00;
-    font-size: 1.5em;
-  }
-
-  input {
-    margin: 0.5em 0;
-    padding: 0.5em;
+  .submit-btn {
     width: 100%;
-  }
-
-  button {
-    padding: 0.5em 1em;
-    background-color: #ff3e00;
+    height: 40px;
     color: white;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: skyblue;
     border: none;
-    cursor: pointer;
+    border-radius: 5px;
+    margin: 0px 5px 0px 5px;
   }
 
-  button:hover {
-    background-color: #e63800;
+  #email {
+    height: 40px;
+    padding: 2px;
+    font-size: 16px;
+  }
+
+  #file {
+    width: 150px;
+  }
+  .submit-btn:hover {
+    background-color: rgb(107, 201, 238);
+    transition: 0.2s ease-in-out;
+  }
+
+  .video-container {
+    margin: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 200px;
+    height: 150px;
+    border-radius: 5px;
+    border: 2px solid gray;
+    border-style: dashed;
+    padding: 10px;
+  }
+
+  /* input {
+    margin: 5px 0px 5px 0px;
+    padding: 5px;
+  } */
+
+  .form {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
   }
 </style>
