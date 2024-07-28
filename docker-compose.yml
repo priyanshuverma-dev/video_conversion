@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    environment:
+      FLASK_ENV: development
+      MINIO_ROOT_USER: adminminio
+      MINIO_ROOT_PASSWORD: adminminio
+      MINIO_HOST: minio:9000
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      EMAIL_HOST: maildev
+      EMAIL_PORT: 1025
+    ports:
+      - "5000:5000"
+    depends_on:
+      - minio
+      - rabbitmq
+
+  processing_service:
+    build: ./backend
+    command: ["python", "app/processing_service.py"]
+    environment:
+      MINIO_ROOT_USER: adminminio
+      MINIO_ROOT_PASSWORD: adminminio
+      MINIO_HOST: minio:9000
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      EMAIL_HOST: maildev
+      EMAIL_PORT: 1025
+    depends_on:
+      - rabbitmq
+      - minio
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  minio:
+    image: minio/minio
+    command: server /data --console-address :9090
+    environment:
+      MINIO_ROOT_USER: adminminio
+      MINIO_ROOT_PASSWORD: adminminio
+    ports:
+      - "9000:9000"
+      - "9090:9090"
+    volumes:
+      - minio-data:/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  maildev:
+    image: maildev/maildev
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+
+volumes:
+  minio-data:
