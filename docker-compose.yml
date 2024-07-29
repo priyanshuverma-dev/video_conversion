@@ -20,7 +20,7 @@ services:
 
   processing_service:
     build: ./backend
-    command: ["python", "app/processing_service.py"]
+    command: ["python", "app/processing_service/main.py"]
     environment:
       MINIO_ROOT_USER: adminminio
       MINIO_ROOT_PASSWORD: adminminio
@@ -32,6 +32,7 @@ services:
     depends_on:
       - rabbitmq
       - minio
+    restart: always
 
   frontend:
     build: ./frontend
